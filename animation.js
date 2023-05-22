@@ -5,8 +5,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 var stars = [],
-  FPS = 25,
-  x = 256,
+  FPS = 15,
+  x = 255,
   mouse = {
     x: 0,
     y: 0
@@ -72,8 +72,8 @@ function distance(point1, point2) {
 }
 
 let mx = false;
-let min = 15;
-let max = 25;
+let min = 22;
+let max = 40;
 
 function update() {
   if(FPS === max)mx= true;
