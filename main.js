@@ -49,7 +49,7 @@ function isGameOver(board) {
   return true;
 }
 
-function getBestMove(board, depth, maximizingPlayer) {
+function getBestMove(board, depth, alpha, beta, maximizingPlayer) {
   if (isGameOver(board)) {
     if (!board.includes('')) {
       return 0;
@@ -60,42 +60,61 @@ function getBestMove(board, depth, maximizingPlayer) {
     return 1;
   }
 
-  let bestScore;
-  let bestMove;
-
   if (maximizingPlayer) {
-    bestScore = -Infinity;
+    let bestScore = -Infinity;
+    let bestMove;
+
     for (let i = 0; i < board.length; i++) {
       if (board[i] === '') {
         board[i] = aiSymbol;
-        let score = getBestMove(board, depth + 1, false);
+        let score = getBestMove(board, depth + 1, alpha, beta, false);
         board[i] = '';
+
         if (score > bestScore) {
           bestScore = score;
           bestMove = i;
         }
+
+        alpha = Math.max(alpha, bestScore);
+        if (alpha >= beta) {
+          break;
+        }
       }
     }
+
+    if (depth === 0) {
+      const winnableMoveIndex = checkWinnableMove(board);
+      if (winnableMoveIndex !== -1) {
+        return winnableMoveIndex;
+      }
+      return bestMove;
+    }
+
+    return bestScore;
   } else {
-    bestScore = Infinity;
+    let bestScore = Infinity;
+    let bestMove;
+
     for (let i = 0; i < board.length; i++) {
       if (board[i] === '') {
         board[i] = playerSymbol;
-        let score = getBestMove(board, depth + 1, true);
+        let score = getBestMove(board, depth + 1, alpha, beta, true);
         board[i] = '';
+
         if (score < bestScore) {
           bestScore = score;
           bestMove = i;
         }
+
+        beta = Math.min(beta, bestScore);
+        if (alpha >= beta) {
+          break;
+        }
       }
     }
-  }
 
-  if (depth === 0) {
-    return bestMove;
+    return bestScore;
   }
-
-  return bestScore;
 }
 
 
@@ -182,16 +201,8 @@ function checkWinnableMove(board) {
   return -1;
 }
 
-function getBestMoveIndex() {
-  const winnableMoveIndex = checkWinnableMove(board);
-  if (winnableMoveIndex !== -1) {
-    return winnableMoveIndex;
-  }
-  return getBestMove(board, 0, true);
-}
-
 function makeComputerMoveMinMax() {
-  const bestMoveIndex = getBestMoveIndex();
+  const bestMoveIndex = getBestMove(board, 0, -Infinity, Infinity, true);
   const bestMoveSquare = squares[bestMoveIndex];
   board[bestMoveIndex] = aiSymbol;
   bestMoveSquare.classList.add(aiSymbol);
