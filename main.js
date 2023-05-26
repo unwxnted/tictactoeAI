@@ -166,33 +166,6 @@ function checkGameOver() {
   return false;
 }
 
-function checkWinnableMove(board) {
-
-  for (let i = 0; i < board.length; i++) {
-    if (board[i] === '') {
-      board[i] = 'O';
-      if (isGameOver(board)) {
-        board[i] = '';
-        return i;
-      }
-      board[i] = '';
-    }
-  }
-
-  for (let i = 0; i < board.length; i++) {
-    if (board[i] === '') {
-      board[i] = 'X';
-      if (isGameOver(board)) {
-        board[i] = '';
-        return i;
-      }
-      board[i] = '';
-    }
-  }
-
-  return -1;
-}
-
 function makeComputerMoveMinMax() {
   const bestMoveIndex = getBestMove(board, 0, -Infinity, Infinity, true);
   const bestMoveSquare = squares[bestMoveIndex];
