@@ -38,26 +38,24 @@ function isGameOver(board) {
   for (let i = 0; i < winningCombinations.length; i++) {
     const [a, b, c] = winningCombinations[i];
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return true;
+      return board[a];
     }
   }
 
   if (board.includes('')) {
-    return false;
+    return null;
   }
 
-  return true;
+  return 'Tie';
 }
 
 function getBestMove(board, depth, alpha, beta, maximizingPlayer) {
-  if (isGameOver(board)) {
-    if (!board.includes('')) {
-      return 0;
-    }
-    if (maximizingPlayer) {
-      return -1;
-    }
-    return 1;
+  const winner = isGameOver(board);
+
+  if (winner) {
+    if (winner === aiSymbol) return 10 - depth;
+    if (winner === playerSymbol) return depth - 10;
+    if (winner === 'Tie') return 0;
   }
 
   if (maximizingPlayer) {
@@ -82,13 +80,7 @@ function getBestMove(board, depth, alpha, beta, maximizingPlayer) {
       }
     }
 
-    if (depth === 0) {
-      const winnableMoveIndex = checkWinnableMove(board);
-      if (winnableMoveIndex !== -1) {
-        return winnableMoveIndex;
-      }
-      return bestMove;
-    }
+    if (depth === 0) return bestMove;
 
     return bestScore;
   } else {
@@ -208,7 +200,7 @@ function makeComputerMoveMinMax() {
   bestMoveSquare.classList.add(aiSymbol);
   bestMoveSquare.innerHTML = aiSymbol;
 
-  if (isGameOver(board)) {
+  if(isGameOver(board)) {
     return;
   }
 
