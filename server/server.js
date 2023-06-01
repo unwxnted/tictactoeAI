@@ -18,21 +18,23 @@ app.get("/room", (req, res) => {
     res.render("HM/index");
 });
 
-let currentSymbol = "X";
+let newPlayerSymbol = "X";
+let currentPlayer = "X";
 
 io.on("connection", (socket) => {
     console.log("A user connected");
 
     socket.on("joinRoom", () => {
         console.log(`User joined to room`);
-        socket.emit("startGame", { symbol: currentSymbol });
-        currentSymbol = currentSymbol === "X" ? "O" : "X";
+        socket.emit("startGame", { symbol: newPlayerSymbol, current: currentPlayer });
+        newPlayerSymbol = newPlayerSymbol === "X" ? "O" : "X";
 
         console.log(`Game started in room`);
     });
 
     socket.on("makeMove", ({squareIndex, symbol }) => {
-        io.emit("moveMade", { squareIndex, symbol });
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        io.emit("moveMade", { squareIndex, symbol,  current: currentPlayer });
         console.log(`Move made in the room`);
     });
 

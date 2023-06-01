@@ -4,7 +4,7 @@ const socket = io();
 let board = ['', '', '', '', '', '', '', '', ''];
 
 let mySymbol = '';
-let currentPlayer = 'X';
+let currentPlayer = '';
 
 document.addEventListener("DOMContentLoaded", () => {
     squares.forEach((square) => {
@@ -15,14 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Connected to server");
     });
 
-    socket.on("startGame", ({ symbol }) => {
+    socket.on("startGame", ({ symbol , current}) => {
         console.log("Game started");
         mySymbol = symbol;
+        currentPlayer = current;
     });
 
-    socket.on("moveMade", ({ squareIndex, symbol }) => {
+    socket.on("moveMade", ({ squareIndex, symbol, current }) => {
         makeMove(squareIndex, symbol);
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        currentPlayer = current;
     });
 
     socket.on("gameEnded", ({ winner }) => {
