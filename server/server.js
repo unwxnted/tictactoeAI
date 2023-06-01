@@ -17,7 +17,8 @@ app.get("/room", (req, res) => {
     res.render("HM/index");
 });
 
-let currentSymbol = "O";
+let currentSymbol = "X";
+let playersInRoom = 0;
 
 io.on("connection", (socket) => {
     console.log("A user connected");
@@ -25,17 +26,30 @@ io.on("connection", (socket) => {
     socket.on("joinRoom", (room) => {
         socket.join(room);
         console.log(`User joined room ${room}`);
+        playersInRoom++;
+    
+        if (playersInRoom === 2) {
+            if(currentSymbol === "X") currentSymbol = "O";
+            if(currentSymbol === "O") currentSymbol = "X";
+            io.to(room).emit("startGame", { symbol: currentSymbol });
+            console.log(`Game started in room ${room}`);
+        }
     });
 
     socket.on("startGame", (room) => {
         currentSymbol = currentSymbol === "X" ? "O": "X";
-        io.to(room).emit("gameStarted", { symbol:  currentSymbol});
+        io.to(room).emit("startGame", { symbol:  currentSymbol});
         console.log(`Game started in room ${room}`);
     });
 
     socket.on("makeMove", ({ room, squareIndex, symbol }) => {
         io.to(room).emit("moveMade", { squareIndex, symbol });
         console.log(`Move made in room ${room}`);
+    });
+
+    socket.on("gameEnded", ({ room, winner }) => {
+        io.to(room).emit("gameEnded", { winner });
+        console.log(`Game ended in room ${room}. Winner: ${winner}`);
     });
 
     socket.on("disconnect", () => {

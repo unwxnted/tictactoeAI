@@ -1,0 +1,25 @@
+{
+  "name": "AI Game Hub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unwxnted/tictactoeAI.git"
+  },
+  "keywords": [],
+  "author": "unwxnted",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unwxnted/tictactoeAI/issues"
+  },
+  "homepage": "https://github.com/unwxnted/tictactoeAI#readme",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  }
+}
