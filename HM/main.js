@@ -22,12 +22,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("moveMade", ({ squareIndex, symbol }) => {
         makeMove(squareIndex, symbol);
-        if(currentPlayer === "X") currentPlayer = "O";
-        if(currentPlayer === "O") currentPlayer = "X";
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
     });
 
     socket.on("gameEnded", ({ winner }) => {
         console.log(`Game over. Winner: ${winner}`);
+        setTimeout(() => {
+            board = ['', '', '', '', '', '', '', '', ''];
+            squares.forEach((square) => {
+                square.classList.remove('X', 'O', 'winning');
+                square.innerHTML = '';
+            });
+        }, 800);
     });
 
     function handleClick(event) {
@@ -35,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const squareIndex = square.id;
 
         if (currentPlayer === mySymbol && board[squareIndex] === '') {
-            socket.emit("makeMove", { room: "gameRoom", squareIndex, symbol: currentPlayer });
+            socket.emit("makeMove", { squareIndex, symbol: currentPlayer });
         }
     }
 
@@ -50,8 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    socket.emit("joinRoom", "gameRoom");
-    socket.emit("startGame", "gameRoom");
+    socket.emit("joinRoom");
 });
 
 const winningCombinations = [
@@ -87,14 +92,14 @@ function checkGameOver() {
             squares[a].classList.add('winning');
             squares[b].classList.add('winning');
             squares[c].classList.add('winning');
-            socket.emit("gameEnded", { room: "gameRoom", winner: board[a] });
+            socket.emit("gameEnded", {winner: board[a] });
             alert(`${board[a]} wins!`);
             return;
         }
     }
 
     if (!board.includes('')) {
-        socket.emit("gameEnded", { room: "gameRoom", winner: "nobody" });
+        socket.emit("gameEnded", {winner: "nobody" });
         alert('Tie game!');
     }
 }

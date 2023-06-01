@@ -1,9 +1,10 @@
 const express = require("express");
 const app = express();
-const server = require("http").Server(app);
+const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const path = require("path");
-server.PORT = 3003;
+
+const PORT = 3003;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..'));
@@ -18,38 +19,26 @@ app.get("/room", (req, res) => {
 });
 
 let currentSymbol = "X";
-let playersInRoom = 0;
 
 io.on("connection", (socket) => {
     console.log("A user connected");
 
-    socket.on("joinRoom", (room) => {
-        socket.join(room);
-        console.log(`User joined room ${room}`);
-        playersInRoom++;
-    
-        if (playersInRoom === 2) {
-            if(currentSymbol === "X") currentSymbol = "O";
-            if(currentSymbol === "O") currentSymbol = "X";
-            io.to(room).emit("startGame", { symbol: currentSymbol });
-            console.log(`Game started in room ${room}`);
-        }
+    socket.on("joinRoom", () => {
+        console.log(`User joined to room`);
+        socket.emit("startGame", { symbol: currentSymbol });
+        currentSymbol = currentSymbol === "X" ? "O" : "X";
+
+        console.log(`Game started in room`);
     });
 
-    socket.on("startGame", (room) => {
-        currentSymbol = currentSymbol === "X" ? "O": "X";
-        io.to(room).emit("startGame", { symbol:  currentSymbol});
-        console.log(`Game started in room ${room}`);
+    socket.on("makeMove", ({squareIndex, symbol }) => {
+        io.emit("moveMade", { squareIndex, symbol });
+        console.log(`Move made in the room`);
     });
 
-    socket.on("makeMove", ({ room, squareIndex, symbol }) => {
-        io.to(room).emit("moveMade", { squareIndex, symbol });
-        console.log(`Move made in room ${room}`);
-    });
-
-    socket.on("gameEnded", ({ room, winner }) => {
-        io.to(room).emit("gameEnded", { winner });
-        console.log(`Game ended in room ${room}. Winner: ${winner}`);
+    socket.on("gameEnded", ({ winner }) => {
+        io.emit("gameEnded", { winner });
+        console.log(`Game ended, Winner: ${winner}`);
     });
 
     socket.on("disconnect", () => {
@@ -57,6 +46,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(server.PORT, () => {
-    console.log(`Server on port ${server.PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server on port ${PORT}`);
 });
