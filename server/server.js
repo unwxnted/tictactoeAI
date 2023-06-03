@@ -20,11 +20,16 @@ app.get("/room", (req, res) => {
 
 let newPlayerSymbol = "X";
 let currentPlayer = "X";
+let reloadFlag = false;
 
 io.on("connection", (socket) => {
     console.log("A user connected");
 
     socket.on("joinRoom", () => {
+        if(!reloadFlag){
+            reloadFlag = true;
+            io.emit("reload");
+        }
         console.log(`User joined to room`);
         socket.emit("startGame", { symbol: newPlayerSymbol, current: currentPlayer });
         newPlayerSymbol = newPlayerSymbol === "X" ? "O" : "X";
@@ -32,9 +37,10 @@ io.on("connection", (socket) => {
         console.log(`Game started in room`);
     });
 
-    socket.on("makeMove", ({squareIndex, symbol }) => {
+    socket.on("makeMove", ({ squareIndex, symbol }) => {
+        if(reloadFlag) reloadFlag = false;
         currentPlayer = currentPlayer === "X" ? "O" : "X";
-        io.emit("moveMade", { squareIndex, symbol,  current: currentPlayer });
+        io.emit("moveMade", { squareIndex, symbol, current: currentPlayer });
         console.log(`Move made in the room`);
     });
 

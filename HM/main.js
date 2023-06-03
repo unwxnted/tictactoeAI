@@ -15,7 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Connected to server");
     });
 
-    socket.on("startGame", ({ symbol , current}) => {
+    socket.on("reload", () => {
+        window.location.reload();
+    });
+
+    socket.on("startGame", ({ symbol, current }) => {
         console.log("Game started");
         mySymbol = symbol;
         currentPlayer = current;
@@ -93,14 +97,14 @@ function checkGameOver() {
             squares[a].classList.add('winning');
             squares[b].classList.add('winning');
             squares[c].classList.add('winning');
-            socket.emit("gameEnded", {winner: board[a] });
+            socket.emit("gameEnded", { winner: board[a] });
             alert(`${board[a]} wins!`);
             return;
         }
     }
 
     if (!board.includes('')) {
-        socket.emit("gameEnded", {winner: "nobody" });
+        socket.emit("gameEnded", { winner: "nobody" });
         alert('Tie game!');
     }
 }
