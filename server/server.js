@@ -4,11 +4,15 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const path = require("path");
 
-const PORT = 3003;
+const PORT = 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..'));
 app.use(express.static(path.join(__dirname, '..')));
+
+app.get("/", (req, res) => {
+    res.render("home/index")
+});
 
 app.get("/PcGame", (req, res) => {
     res.render("AI/index");
